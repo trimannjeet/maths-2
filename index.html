@@ -1,1 +1,525 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101513">
+  <meta name="description" content="An interactive statistical study of daily screen time among 15 students, with frequency distribution, estimated mean, median category, and methodology.">
+  <title>Screen Time, in Perspective | Statistics Practical</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #101513;
+      --ink-soft: #171e1b;
+      --glass: rgba(255, 255, 255, .045);
+      --glass-strong: rgba(255, 255, 255, .075);
+      --line: rgba(239, 244, 224, .12);
+      --muted: #a4aea5;
+      --paper: #f2f4e9;
+      --lime: #d3f36b;
+      --rose: #ee9da7;
+      --lavender: #b7a9ef;
+      --mint: #85d9b8;
+      --gold: #e8c66c;
+      --mono: "DM Mono", monospace;
+      --display: "Space Grotesk", sans-serif;
+      --body: "DM Sans", sans-serif;
+      --max: 1180px;
+    }
 
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html { scroll-behavior: smooth; scroll-padding-top: 92px; }
+    body {
+      margin: 0;
+      color: var(--paper);
+      background:
+        radial-gradient(ellipse at 82% 7%, rgba(107, 137, 95, .15), transparent 28rem),
+        radial-gradient(ellipse at 3% 39%, rgba(114, 94, 143, .11), transparent 32rem),
+        var(--ink);
+      font-family: var(--body);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-image: linear-gradient(rgba(242,244,233,.018) 1px, transparent 1px), linear-gradient(90deg, rgba(242,244,233,.018) 1px, transparent 1px);
+      background-size: 64px 64px;
+      content: "";
+      mask-image: linear-gradient(to bottom, black, transparent 85%);
+      pointer-events: none;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+    .shell { width: min(var(--max), calc(100% - 64px)); margin-inline: auto; }
+    .mono { font-family: var(--mono); }
+    .eyebrow { color: var(--lime); font: 500 11px/1.4 var(--mono); letter-spacing: 0; text-transform: uppercase; }
+
+    .site-header { position: sticky; top: 0; z-index: 20; border-bottom: 1px solid rgba(255,255,255,.07); background: rgba(16,21,19,.78); backdrop-filter: blur(18px); }
+    .nav { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { display: flex; align-items: center; gap: 12px; font: 600 13px/1 var(--display); letter-spacing: 0; }
+    .brand-mark { width: 30px; aspect-ratio: 1; display: grid; place-items: center; color: var(--ink); background: var(--lime); border-radius: 9px; font: 700 15px/1 var(--display); transform: rotate(-7deg); }
+    .nav-links { display: flex; align-items: center; gap: 28px; color: #b5beb5; font-size: 12px; }
+    .nav-links a { transition: color .2s ease; }
+    .nav-links a:hover, .nav-links a:focus-visible { color: var(--lime); }
+    .nav-tag { color: var(--muted); font: 400 10px/1 var(--mono); }
+
+    .hero { min-height: 620px; display: grid; grid-template-columns: 1.05fr .95fr; align-items: center; gap: 56px; padding-block: 84px 86px; }
+    .hero-copy { max-width: 610px; animation: rise .75s both; }
+    .hero-kicker { display: flex; align-items: center; gap: 10px; margin-bottom: 25px; }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 16px rgba(211,243,107,.7); }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 650px; margin-bottom: 23px; font: 500 clamp(54px, 7vw, 91px)/.98 var(--display); letter-spacing: 0; }
+    h1 .accent { color: var(--lime); }
+    .hero-copy > p { max-width: 490px; margin-bottom: 31px; color: #b2bcb3; font-size: 16px; }
+    .title-compact { display: none; }
+    .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .button { min-height: 45px; display: inline-flex; align-items: center; justify-content: center; gap: 11px; padding: 0 17px; border: 1px solid var(--line); border-radius: 6px; color: var(--paper); background: var(--glass); font-size: 12px; font-weight: 600; transition: transform .2s, background .2s, border-color .2s; }
+    .button:hover { transform: translateY(-2px); border-color: rgba(211,243,107,.45); background: var(--glass-strong); }
+    .button-primary { border-color: var(--lime); color: var(--ink); background: var(--lime); }
+    .button-primary:hover { background: #e0ff88; }
+    .arrow { font-size: 16px; line-height: 1; }
+
+    .hero-visual { position: relative; min-height: 400px; display: flex; align-items: center; justify-content: center; animation: rise .8s .12s both; }
+    .orbit { position: absolute; width: min(390px, 80%); aspect-ratio: 1; border: 1px solid rgba(211,243,107,.14); border-radius: 50%; }
+    .orbit::before, .orbit::after { position: absolute; inset: 22px; border: 1px solid rgba(211,243,107,.09); border-radius: 50%; content: ""; }
+    .orbit::after { inset: -18px; border-style: dashed; opacity: .46; }
+    .orbit-dot { position: absolute; top: 13%; right: 12%; width: 10px; aspect-ratio: 1; border-radius: 50%; background: var(--rose); box-shadow: 0 0 22px rgba(238,157,167,.6); }
+    .summary-card { position: relative; z-index: 1; width: min(440px, 100%); padding: 25px; border: 1px solid rgba(255,255,255,.15); border-radius: 12px; background: linear-gradient(145deg, rgba(255,255,255,.11), rgba(255,255,255,.035)); box-shadow: 0 24px 80px rgba(0,0,0,.28); backdrop-filter: blur(20px); }
+    .summary-top { display: flex; align-items: center; justify-content: space-between; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+    .summary-top strong { font: 500 13px var(--display); }
+    .window-dots { display: flex; gap: 5px; }
+    .window-dots i { width: 6px; height: 6px; display: block; border-radius: 50%; background: #778177; }
+    .window-dots i:first-child { background: var(--rose); }
+    .window-dots i:nth-child(2) { background: var(--gold); }
+    .summary-main { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; padding-block: 25px 22px; }
+    .donut { position: relative; width: 174px; max-width: 100%; aspect-ratio: 1; justify-self: center; border-radius: 50%; background: conic-gradient(var(--rose) 0 20%, var(--lavender) 20% 46.67%, var(--mint) 46.67% 73.34%, var(--gold) 73.34% 100%); }
+    .donut::after { position: absolute; inset: 18px; display: grid; place-content: center; border: 1px solid rgba(255,255,255,.12); border-radius: 50%; background: #18201c; content: "15\A RESPONSES"; white-space: pre; text-align: center; font: 500 12px/1.8 var(--mono); }
+    .summary-stats { display: grid; gap: 18px; }
+    .stat-label { display: block; margin-bottom: 2px; color: var(--muted); font: 400 9px var(--mono); text-transform: uppercase; }
+    .stat-value { display: block; font: 500 22px/1.2 var(--display); }
+    .stat-note { display: block; margin-top: 3px; color: #879188; font-size: 10px; }
+    .summary-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; padding-top: 17px; border-top: 1px solid var(--line); }
+    .legend-item { display: flex; align-items: center; gap: 7px; color: #c4ccc4; font-size: 10px; }
+    .swatch { width: 7px; aspect-ratio: 1; flex: 0 0 auto; border-radius: 2px; background: var(--swatch); }
+    .scan-label { position: absolute; right: -5px; bottom: 34px; padding: 8px 11px; border: 1px solid var(--line); border-radius: 5px; color: var(--muted); background: #151c18; font: 400 9px var(--mono); transform: rotate(3deg); }
+
+    .ticker { border-block: 1px solid var(--line); background: rgba(255,255,255,.025); }
+    .ticker-inner { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 25px; }
+    .ticker-item { display: flex; align-items: baseline; gap: 10px; white-space: nowrap; }
+    .ticker-item strong { color: var(--lime); font: 500 19px var(--display); }
+    .ticker-item span { color: var(--muted); font: 400 10px var(--mono); text-transform: uppercase; }
+    .ticker-divider { width: 1px; height: 24px; flex: 0 0 auto; background: var(--line); }
+
+    .section { padding-block: 112px; }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 30px; margin-bottom: 34px; }
+    .section-head h2 { margin: 11px 0 0; font: 500 clamp(32px, 4vw, 48px)/1.07 var(--display); letter-spacing: 0; }
+    .section-head p { max-width: 360px; margin: 0; color: var(--muted); font-size: 13px; }
+    .glass { border: 1px solid var(--line); border-radius: 9px; background: linear-gradient(135deg, rgba(255,255,255,.065), rgba(255,255,255,.025)); box-shadow: inset 0 1px rgba(255,255,255,.035); backdrop-filter: blur(14px); }
+    .distribution-layout { display: grid; grid-template-columns: 1.3fr .7fr; gap: 16px; }
+    .chart-panel { min-height: 386px; padding: 25px; }
+    .panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 27px; }
+    .panel-heading h3 { margin: 0; font: 500 15px var(--display); }
+    .panel-heading .mono { color: var(--muted); font-size: 9px; }
+    .segmented { display: inline-flex; padding: 3px; border: 1px solid var(--line); border-radius: 6px; background: rgba(0,0,0,.16); }
+    .segmented button { min-height: 29px; padding: 0 11px; border: 0; border-radius: 4px; color: var(--muted); background: transparent; cursor: pointer; font-size: 10px; }
+    .segmented button[aria-pressed="true"] { color: var(--ink); background: var(--lime); font-weight: 700; }
+    .bar-chart { display: grid; gap: 18px; }
+    .bar-row { display: grid; grid-template-columns: 118px 1fr 36px; align-items: center; gap: 13px; }
+    .bar-label { color: #bec7bd; font-size: 11px; }
+    .bar-track { height: 24px; overflow: hidden; border: 1px solid rgba(255,255,255,.045); border-radius: 3px; background: rgba(255,255,255,.035); }
+    .bar-fill { height: 100%; width: var(--width); border-radius: 2px; background: var(--bar); transition: width .65s cubic-bezier(.2,.8,.2,1); }
+    .bar-count { color: var(--paper); font: 500 12px var(--mono); text-align: right; }
+    .axis { display: flex; justify-content: space-between; margin: 12px 49px 0 131px; color: #768178; font: 400 9px var(--mono); }
+    .share-chart { min-height: 220px; display: none; place-items: center; grid-template-columns: 1fr 1fr; gap: 25px; }
+    .share-chart.is-visible { display: grid; }
+    .share-wheel { width: 190px; max-width: 100%; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(var(--rose) 0 20%, var(--lavender) 20% 46.67%, var(--mint) 46.67% 73.34%, var(--gold) 73.34% 100%); box-shadow: 0 0 50px rgba(211,243,107,.08); }
+    .share-legend { display: grid; gap: 13px; }
+    .share-legend .legend-item { font-size: 11px; }
+    .share-legend b { margin-left: auto; color: var(--paper); font: 400 10px var(--mono); }
+    .distribution-aside { display: grid; grid-template-rows: 1fr 1fr; gap: 16px; }
+    .insight-card { padding: 23px; display: flex; flex-direction: column; justify-content: space-between; }
+    .insight-number { margin-block: 24px 9px; color: var(--lime); font: 500 50px/.9 var(--display); }
+    .insight-card h3 { margin: 0 0 8px; font: 500 15px var(--display); }
+    .insight-card p { margin: 0; color: var(--muted); font-size: 11px; }
+    .insight-marker { color: var(--rose); font: 400 10px var(--mono); }
+    .histogram-panel { margin-top: 16px; padding: 24px; }
+    .histogram-head { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .histogram-head h3 { margin: 7px 0 0; font: 500 16px var(--display); }
+    .assumption-tag { padding: 7px 9px; border: 1px solid rgba(232,198,108,.25); border-radius: 4px; color: var(--gold); font: 400 9px var(--mono); }
+    .histogram-chart { height: 240px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: stretch; margin-top: 22px; border-bottom: 1px solid var(--line); background: repeating-linear-gradient(to top, transparent 0, transparent 47px, rgba(255,255,255,.07) 48px); }
+    .histogram-column { min-width: 0; display: flex; flex-direction: column; align-items: stretch; justify-content: flex-end; }
+    .histogram-count { margin-bottom: 7px; color: var(--paper); font: 500 11px var(--mono); text-align: center; }
+    .histogram-bin { height: var(--height); min-height: 3px; border-right: 1px solid rgba(16,21,19,.45); background: var(--bar); }
+    .histogram-bin.assumed { outline: 1px dashed var(--gold); outline-offset: -4px; opacity: .7; }
+    .histogram-label { padding-top: 9px; color: #bec7bd; font-size: 10px; text-align: center; }
+    .histogram-note { margin: 14px 0 0; color: var(--muted); font-size: 10px; }
+
+    .photo-band { min-height: 310px; position: relative; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; border: 1px solid var(--line); border-radius: 10px; background: #1b2420; }
+    .photo-side { position: relative; min-height: 310px; overflow: hidden; }
+    .photo-side img { position: absolute; width: 100%; height: 100%; object-fit: cover; object-position: center 45%; filter: saturate(.72); }
+    .photo-side::after { position: absolute; inset: 0; background: linear-gradient(90deg, transparent 30%, #1b2420 100%), linear-gradient(0deg, rgba(16,21,19,.34), transparent 60%); content: ""; }
+    .photo-caption { position: absolute; left: 18px; bottom: 16px; z-index: 1; color: #e9eee5; font: 400 9px var(--mono); }
+    .photo-copy { display: flex; flex-direction: column; justify-content: center; padding: 40px clamp(25px, 5vw, 70px) 40px 10px; }
+    .photo-copy blockquote { max-width: 460px; margin: 19px 0 22px; font: 400 clamp(22px, 3vw, 34px)/1.22 var(--display); }
+    .photo-copy p { margin: 0; color: var(--muted); font-size: 12px; }
+
+    .analysis { padding-top: 90px; }
+    .analysis-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .analysis-card { min-height: 245px; position: relative; padding: 24px; overflow: hidden; }
+    .analysis-card::after { position: absolute; right: -34px; bottom: -82px; width: 170px; aspect-ratio: 1; border: 1px solid rgba(211,243,107,.16); border-radius: 50%; box-shadow: 0 0 0 16px rgba(211,243,107,.025), 0 0 0 34px rgba(211,243,107,.018); content: ""; }
+    .analysis-card:nth-child(2)::after { border-color: rgba(238,157,167,.18); box-shadow: 0 0 0 16px rgba(238,157,167,.025), 0 0 0 34px rgba(238,157,167,.018); }
+    .analysis-card:nth-child(3)::after { border-color: rgba(183,169,239,.18); box-shadow: 0 0 0 16px rgba(183,169,239,.025), 0 0 0 34px rgba(183,169,239,.018); }
+    .analysis-index { color: var(--muted); font: 400 10px var(--mono); }
+    .analysis-card h3 { margin: 30px 0 8px; font: 500 18px var(--display); }
+    .analysis-value { margin: 0 0 15px; color: var(--lime); font: 500 32px/1 var(--display); }
+    .analysis-card:nth-child(2) .analysis-value { color: var(--rose); }
+    .analysis-card:nth-child(3) .analysis-value { color: var(--lavender); }
+    .analysis-card p { position: relative; z-index: 1; max-width: 280px; margin: 0; color: var(--muted); font-size: 11px; }
+    .formula { display: block; margin-top: 14px; color: #d7dfd4; font: 400 10px var(--mono); }
+
+    .records { padding-top: 96px; }
+    .records-panel { overflow: hidden; }
+    .records-top { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 22px 24px; border-bottom: 1px solid var(--line); }
+    .records-top h3 { margin: 0; font: 500 15px var(--display); }
+    .records-top span { color: var(--muted); font: 400 10px var(--mono); }
+    .record-grid { display: grid; grid-template-columns: repeat(5, 1fr); }
+    .record { min-height: 62px; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-right: 1px solid rgba(255,255,255,.055); border-bottom: 1px solid rgba(255,255,255,.055); }
+    .record:nth-child(5n) { border-right: 0; }
+    .record-id { width: 25px; height: 25px; flex: 0 0 auto; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; color: var(--muted); font: 400 9px var(--mono); }
+    .record-time { color: #d6ddd4; font-size: 10px; line-height: 1.3; }
+    .record-key { width: 6px; height: 6px; flex: 0 0 auto; border-radius: 50%; background: var(--record-color); }
+    .data-note { display: flex; align-items: flex-start; gap: 12px; margin-top: 15px; padding: 17px 19px; border: 1px solid rgba(232,198,108,.2); border-radius: 7px; background: rgba(232,198,108,.055); }
+    .note-symbol { color: var(--gold); font: 500 14px var(--mono); }
+    .data-note p { margin: 0; color: #c1c8b7; font-size: 11px; }
+    .data-note strong { color: var(--paper); font-weight: 600; }
+
+    .method { padding-top: 96px; }
+    .method-grid { display: grid; grid-template-columns: 1fr .8fr; gap: 16px; }
+    .method-main, .method-side { padding: 26px; }
+    .method-main h3, .method-side h3 { margin: 0 0 17px; font: 500 16px var(--display); }
+    .method-main p { color: #b5beb5; font-size: 12px; }
+    .method-main p:last-child { margin-bottom: 0; }
+    .method-side { background: linear-gradient(145deg, rgba(238,157,167,.08), rgba(255,255,255,.025)); }
+    .method-side p { margin-bottom: 0; color: #c0c8bf; font-size: 11px; }
+    .method-side strong { color: var(--rose); font-weight: 600; }
+    .steps { display: grid; gap: 13px; margin: 22px 0 0; padding: 0; list-style: none; }
+    .steps li { display: grid; grid-template-columns: 25px 1fr; gap: 10px; color: #abb5ac; font-size: 11px; }
+    .steps li span { color: var(--lime); font: 400 10px var(--mono); }
+
+    .closing { padding-block: 105px 80px; text-align: center; }
+    .closing h2 { max-width: 730px; margin: 14px auto 17px; font: 500 clamp(34px, 5vw, 60px)/1.05 var(--display); }
+    .closing p { max-width: 510px; margin: 0 auto; color: var(--muted); font-size: 13px; }
+    .closing-rule { width: 1px; height: 70px; margin: 28px auto 0; background: linear-gradient(var(--lime), transparent); }
+    .site-footer { border-top: 1px solid var(--line); }
+    .footer-inner { min-height: 110px; display: grid; grid-template-columns: .8fr .9fr 1.6fr; align-items: center; gap: 24px; padding-block: 20px; color: var(--muted); }
+    .footer-meta { display: grid; gap: 5px; }
+    .footer-label { color: var(--lime); font: 400 9px var(--mono); }
+    .footer-meta strong { color: #dce4d9; font: 500 12px var(--display); }
+    .footer-meta small { color: var(--muted); font: 400 9px var(--mono); }
+    .footer-team { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px 16px; color: #dce4d9; font-size: 10px; }
+    .footer-team small { margin-left: 5px; color: var(--muted); font: 400 8px var(--mono); }
+
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .65s ease, transform .65s ease; }
+    .reveal.is-in { opacity: 1; transform: translateY(0); }
+    @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } .reveal { opacity: 1; transform: none; } }
+
+    @media (max-width: 850px) {
+      .shell { width: min(100% - 42px, var(--max)); }
+      .hero { min-height: auto; grid-template-columns: 1fr; gap: 20px; padding-block: 76px 55px; }
+      .hero-copy { max-width: 680px; }
+      .hero-visual { min-height: 380px; }
+      .ticker-inner { justify-content: flex-start; overflow-x: auto; scrollbar-width: none; }
+      .ticker-inner::-webkit-scrollbar { display: none; }
+      .ticker-item { padding-block: 5px; }
+      .distribution-layout { grid-template-columns: 1fr; }
+      .distribution-aside { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+      .insight-card { min-height: 210px; }
+      .photo-band { grid-template-columns: .85fr 1.15fr; }
+      .record-grid { grid-template-columns: repeat(3, 1fr); }
+      .record:nth-child(5n) { border-right: 1px solid rgba(255,255,255,.055); }
+      .record:nth-child(3n) { border-right: 0; }
+    }
+    @media (max-width: 600px) {
+      .shell { width: calc(100% - 36px); }
+      .nav { min-height: 64px; }
+      .nav-links { gap: 15px; }
+      .nav-links a { font-size: 10px; }
+      .nav-tag { display: none; }
+      .hero { padding-block: 58px 32px; }
+      h1 { font-size: clamp(40px, 11vw, 58px); }
+      .title-wide { display: none; }
+      .title-compact { display: block; }
+      .hero-copy > p { font-size: 14px; }
+      .hero-visual { min-height: 345px; }
+      .summary-card { padding: 19px; }
+      .summary-main { gap: 13px; }
+      .donut { width: 140px; }
+      .stat-value { font-size: 19px; }
+      .scan-label { right: 0; bottom: 14px; }
+      .ticker-inner { min-height: 62px; gap: 18px; }
+      .ticker-item { gap: 7px; }
+      .ticker-item strong { font-size: 16px; }
+      .ticker-item span { font-size: 8px; }
+      .section { padding-block: 78px; }
+      .section-head { align-items: flex-start; flex-direction: column; gap: 13px; margin-bottom: 24px; }
+      .section-head p { font-size: 12px; }
+      .chart-panel { min-height: 350px; padding: 18px 15px; }
+      .panel-heading { align-items: flex-start; }
+      .panel-heading h3 { font-size: 13px; }
+      .panel-heading .mono { font-size: 8px; }
+      .bar-row { grid-template-columns: 91px 1fr 24px; gap: 8px; }
+      .bar-label { font-size: 9px; }
+      .bar-track { height: 20px; }
+      .axis { margin-left: 99px; margin-right: 32px; }
+      .share-chart { grid-template-columns: minmax(100px, 1fr) 1fr; gap: 14px; }
+      .share-wheel { width: min(160px, 100%); }
+      .share-legend .legend-item { font-size: 9px; }
+      .distribution-aside { gap: 10px; }
+      .insight-card { min-height: 190px; padding: 17px; }
+      .insight-number { margin-block: 19px 8px; font-size: 41px; }
+      .insight-card h3 { font-size: 13px; }
+      .insight-card p { font-size: 10px; }
+      .histogram-panel { padding: 18px 15px; }
+      .histogram-head { align-items: flex-start; }
+      .histogram-head h3 { font-size: 14px; }
+      .assumption-tag { max-width: 112px; font-size: 8px; line-height: 1.5; }
+      .histogram-chart { height: 205px; }
+      .histogram-label { font-size: 9px; }
+      .photo-band { grid-template-columns: 1fr; }
+      .photo-side { min-height: 220px; }
+      .photo-side::after { background: linear-gradient(0deg, #1b2420 0%, transparent 60%); }
+      .photo-copy { padding: 7px 23px 27px; }
+      .photo-copy blockquote { font-size: 25px; }
+      .analysis { padding-top: 35px; }
+      .analysis-grid { grid-template-columns: 1fr; gap: 10px; }
+      .analysis-card { min-height: 205px; }
+      .analysis-card h3 { margin-top: 21px; }
+      .records { padding-top: 70px; }
+      .records-top { align-items: flex-start; flex-direction: column; gap: 5px; padding: 18px; }
+      .record-grid { grid-template-columns: repeat(2, 1fr); }
+      .record:nth-child(3n) { border-right: 1px solid rgba(255,255,255,.055); }
+      .record:nth-child(2n) { border-right: 0; }
+      .record { min-height: 58px; gap: 8px; padding: 10px; }
+      .record-time { font-size: 9px; }
+      .method { padding-top: 70px; }
+      .method-grid { grid-template-columns: 1fr; gap: 10px; }
+      .method-main, .method-side { padding: 21px; }
+      .closing { padding-block: 80px 60px; }
+      .footer-inner { min-height: 0; grid-template-columns: 1fr; gap: 17px; padding-block: 23px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav shell" aria-label="Main navigation">
+      <a class="brand" href="#top" aria-label="Screen time study home"><span class="brand-mark">S.</span><span>FIELD NOTES <span class="mono" style="color:var(--muted);font-size:10px;font-weight:400">/ 01</span></span></a>
+      <div class="nav-links">
+        <a href="#distribution">The data</a>
+        <a href="#analysis">What it says</a>
+        <a href="#method">Method</a>
+      </div>
+      <span class="nav-tag">CTU · STATISTICS PRACTICAL</span>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero shell" aria-labelledby="page-title">
+      <div class="hero-copy">
+        <div class="hero-kicker eyebrow"><span class="live-dot" aria-hidden="true"></span> A STUDENT DATA STORY <span style="color:var(--muted)">· 2026—27</span></div>
+        <h1 id="page-title"><span class="title-wide">Screen time,<br><span class="accent">in perspective.</span></span><span class="title-compact">Daily screen<br><span class="accent">time, decoded.</span></span></h1>
+        <p>What does a day on screens look like for a small group of students? Fifteen responses, four time bands, and a closer look at what the numbers can (and cannot) tell us.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#distribution">Explore the findings <span class="arrow" aria-hidden="true">↘</span></a>
+          <a class="button" href="#records">See all 15 responses <span class="arrow" aria-hidden="true">↓</span></a>
+        </div>
+      </div>
+      <div class="hero-visual" aria-label="Summary of the 15 responses">
+        <div class="orbit" aria-hidden="true"><span class="orbit-dot"></span></div>
+        <div class="summary-card">
+          <div class="summary-top"><strong>Daily screen time / snapshot</strong><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+          <div class="summary-main">
+            <div class="donut" role="img" aria-label="Distribution: 20 percent at 2 to 3 hours and 26.67 percent in each of the other three categories"></div>
+            <div class="summary-stats">
+              <div><span class="stat-label">Selected sample</span><strong class="stat-value">15<span style="color:var(--lime)">.</span></strong><span class="stat-note">student responses</span></div>
+              <div><span class="stat-label">Estimated mean</span><strong class="stat-value">4.10<span style="font-size:13px"> h</span></strong><span class="stat-note">midpoint-based estimate</span></div>
+              <div><span class="stat-label">Median band</span><strong class="stat-value">4–5<span style="font-size:13px"> h</span></strong><span class="stat-note">exact time not recorded</span></div>
+            </div>
+          </div>
+          <div class="summary-legend" aria-label="Category color key">
+            <span class="legend-item"><i class="swatch" style="--swatch:var(--rose)"></i>2–3 hours · 3</span>
+            <span class="legend-item"><i class="swatch" style="--swatch:var(--lavender)"></i>3–4 hours · 4</span>
+            <span class="legend-item"><i class="swatch" style="--swatch:var(--mint)"></i>4–5 hours · 4</span>
+            <span class="legend-item"><i class="swatch" style="--swatch:var(--gold)"></i>More than 5 · 4</span>
+          </div>
+        </div>
+        <span class="scan-label">SURVEY / n = 15</span>
+      </div>
+    </section>
+
+    <div class="ticker" aria-label="Study highlights">
+      <div class="ticker-inner shell">
+        <div class="ticker-item"><strong>15</strong><span>selected records</span></div><i class="ticker-divider"></i>
+        <div class="ticker-item"><strong>4</strong><span>response bands</span></div><i class="ticker-divider"></i>
+        <div class="ticker-item"><strong>3-way</strong><span>modal tie</span></div><i class="ticker-divider"></i>
+        <div class="ticker-item"><strong>1</strong><span>open-ended band</span></div>
+      </div>
+    </div>
+
+    <section class="section shell" id="distribution" aria-labelledby="distribution-title">
+      <div class="section-head reveal">
+        <div><span class="eyebrow">01 / THE DISTRIBUTION</span><h2 id="distribution-title">A fairly even split.<br>One smaller band.</h2></div>
+        <p>The three highest screen-time categories are tied at four students each. The 2–3 hour group is just one student smaller.</p>
+      </div>
+      <div class="distribution-layout reveal">
+        <div class="glass chart-panel">
+          <div class="panel-heading"><h3>Responses by daily screen time</h3><span class="mono">N = 15 · frequency</span></div>
+          <div class="bar-chart" id="barChart" aria-label="Bar chart of response frequencies">
+            <div class="bar-row"><span class="bar-label">2–3 hours</span><div class="bar-track"><div class="bar-fill" style="--width:60%;--bar:var(--rose)"></div></div><span class="bar-count">03</span></div>
+            <div class="bar-row"><span class="bar-label">3–4 hours</span><div class="bar-track"><div class="bar-fill" style="--width:80%;--bar:var(--lavender)"></div></div><span class="bar-count">04</span></div>
+            <div class="bar-row"><span class="bar-label">4–5 hours</span><div class="bar-track"><div class="bar-fill" style="--width:80%;--bar:var(--mint)"></div></div><span class="bar-count">04</span></div>
+            <div class="bar-row"><span class="bar-label">More than 5</span><div class="bar-track"><div class="bar-fill" style="--width:80%;--bar:var(--gold)"></div></div><span class="bar-count">04</span></div>
+          </div>
+          <div class="axis mono" id="barAxis"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5 students</span></div>
+          <div class="share-chart" id="shareChart" aria-label="Pie chart of response percentages">
+            <div class="share-wheel" role="img" aria-label="Pie chart: 20 percent, 26.67 percent, 26.67 percent, 26.67 percent"></div>
+            <div class="share-legend">
+              <span class="legend-item"><i class="swatch" style="--swatch:var(--rose)"></i>2–3 hours <b>20.00%</b></span>
+              <span class="legend-item"><i class="swatch" style="--swatch:var(--lavender)"></i>3–4 hours <b>26.67%</b></span>
+              <span class="legend-item"><i class="swatch" style="--swatch:var(--mint)"></i>4–5 hours <b>26.67%</b></span>
+              <span class="legend-item"><i class="swatch" style="--swatch:var(--gold)"></i>More than 5 <b>26.67%</b></span>
+            </div>
+          </div>
+          <div class="panel-heading" style="margin:29px 0 0;justify-content:flex-end"><div class="segmented" role="group" aria-label="Choose chart type"><button type="button" data-chart="bars" aria-pressed="true">Frequency</button><button type="button" data-chart="share" aria-pressed="false">Share</button></div></div>
+        </div>
+        <aside class="distribution-aside">
+          <article class="glass insight-card"><span class="insight-marker">↗ &nbsp; AT A GLANCE</span><div><div class="insight-number">80%</div><h3>are in the 3+ hour bands</h3><p>12 of the 15 selected students reported at least 3 hours per day.</p></div></article>
+          <article class="glass insight-card"><span class="insight-marker" style="color:var(--gold)">! &nbsp; READ WITH CARE</span><div><div class="insight-number" style="color:var(--gold)">26.7%</div><h3>selected “More than 5”</h3><p>This response band has no upper boundary, so it cannot be treated as a measured interval.</p></div></article>
+        </aside>
+      </div>
+      <div class="glass histogram-panel reveal">
+        <div class="histogram-head"><div><span class="eyebrow">GROUPED VIEW</span><h3>Histogram / grouped intervals</h3></div><span class="assumption-tag">* ASSUMED 5–6 HRS</span></div>
+        <div class="histogram-chart" role="img" aria-label="Illustrative histogram: 3 students in 2 to 3 hours and 4 students in each following interval; the 5 to 6 hour interval is assumed.">
+          <div class="histogram-column"><span class="histogram-count">3</span><div class="histogram-bin" style="--height:60%;--bar:var(--rose)"></div><span class="histogram-label">2–3 hrs</span></div>
+          <div class="histogram-column"><span class="histogram-count">4</span><div class="histogram-bin" style="--height:80%;--bar:var(--lavender)"></div><span class="histogram-label">3–4 hrs</span></div>
+          <div class="histogram-column"><span class="histogram-count">4</span><div class="histogram-bin" style="--height:80%;--bar:var(--mint)"></div><span class="histogram-label">4–5 hrs</span></div>
+          <div class="histogram-column"><span class="histogram-count">4</span><div class="histogram-bin assumed" style="--height:80%;--bar:var(--gold)"></div><span class="histogram-label">5–6 hrs*</span></div>
+        </div>
+        <p class="histogram-note">The final response was “More than 5 hours.” Showing it as 5–6 hours is an illustration only, not a measured upper boundary.</p>
+      </div>
+    </section>
+
+    <section class="shell reveal" aria-label="Context">
+      <div class="photo-band">
+        <div class="photo-side"><img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&amp;fit=crop&amp;w=1100&amp;q=85" alt="Students collaborating around a table with laptops and study materials" loading="lazy"><span class="photo-caption">STUDY, CONNECTION, EVERYDAY TECHNOLOGY</span></div>
+        <div class="photo-copy"><span class="eyebrow">BEYOND THE NUMBER</span><blockquote>“A category is a useful beginning, not the whole story.”</blockquote><p>This survey captures ranges, not exact hours or what each student was doing on a screen. That distinction matters when interpreting an average.</p></div>
+      </div>
+    </section>
+
+    <section class="section shell analysis" id="analysis" aria-labelledby="analysis-title">
+      <div class="section-head reveal">
+        <div><span class="eyebrow">02 / THE STATISTICS</span><h2 id="analysis-title">Three measures.<br>Three different answers.</h2></div>
+        <p>Because respondents chose bands rather than exact values, the mean is estimated and the median is reported as a category.</p>
+      </div>
+      <div class="analysis-grid">
+        <article class="glass analysis-card reveal"><span class="analysis-index">A / CENTRAL TENDENCY</span><h3>Estimated mean</h3><div class="analysis-value">4.10 h</div><p>Class midpoints estimate the grouped average. The final category is illustratively treated as 5–6 hours.</p><span class="formula">Σfx ÷ N = 61.5 ÷ 15</span></article>
+        <article class="glass analysis-card reveal"><span class="analysis-index">B / MIDDLE OBSERVATION</span><h3>Median category</h3><div class="analysis-value">4–5 h</div><p>For 15 ordered responses, the middle is the 8th observation, which falls in the 4–5 hour band.</p><span class="formula">(N + 1) ÷ 2 = 8th</span></article>
+        <article class="glass analysis-card reveal"><span class="analysis-index">C / MOST COMMON</span><h3>Mode</h3><div class="analysis-value">3 categories</div><p>3–4, 4–5, and more than 5 hours each occur four times. There is no single modal category.</p><span class="formula">Highest frequency = 4</span></article>
+      </div>
+    </section>
+
+    <section class="section shell records" id="records" aria-labelledby="records-title">
+      <div class="section-head reveal">
+        <div><span class="eyebrow">03 / THE RESPONSES</span><h2 id="records-title">Every record,<br>in the open.</h2></div>
+        <p>The dataset below is the working sample reproduced in the project. Its category counts add up to 15.</p>
+      </div>
+      <div class="glass records-panel reveal">
+        <div class="records-top"><h3>Daily screen-time responses</h3><span>STUDENT ID &nbsp; / &nbsp; RESPONSE BAND</span></div>
+        <div class="record-grid" aria-label="Raw responses from 15 students">
+          <div class="record"><span class="record-id">01</span><i class="record-key" style="--record-color:var(--lavender)"></i><span class="record-time">3–4 hours</span></div>
+          <div class="record"><span class="record-id">02</span><i class="record-key" style="--record-color:var(--lavender)"></i><span class="record-time">3–4 hours</span></div>
+          <div class="record"><span class="record-id">03</span><i class="record-key" style="--record-color:var(--rose)"></i><span class="record-time">2–3 hours</span></div>
+          <div class="record"><span class="record-id">04</span><i class="record-key" style="--record-color:var(--gold)"></i><span class="record-time">More than 5 hours</span></div>
+          <div class="record"><span class="record-id">05</span><i class="record-key" style="--record-color:var(--gold)"></i><span class="record-time">More than 5 hours</span></div>
+          <div class="record"><span class="record-id">06</span><i class="record-key" style="--record-color:var(--rose)"></i><span class="record-time">2–3 hours</span></div>
+          <div class="record"><span class="record-id">07</span><i class="record-key" style="--record-color:var(--mint)"></i><span class="record-time">4–5 hours</span></div>
+          <div class="record"><span class="record-id">08</span><i class="record-key" style="--record-color:var(--rose)"></i><span class="record-time">2–3 hours</span></div>
+          <div class="record"><span class="record-id">09</span><i class="record-key" style="--record-color:var(--lavender)"></i><span class="record-time">3–4 hours</span></div>
+          <div class="record"><span class="record-id">10</span><i class="record-key" style="--record-color:var(--gold)"></i><span class="record-time">More than 5 hours</span></div>
+          <div class="record"><span class="record-id">11</span><i class="record-key" style="--record-color:var(--gold)"></i><span class="record-time">More than 5 hours</span></div>
+          <div class="record"><span class="record-id">12</span><i class="record-key" style="--record-color:var(--lavender)"></i><span class="record-time">3–4 hours</span></div>
+          <div class="record"><span class="record-id">13</span><i class="record-key" style="--record-color:var(--mint)"></i><span class="record-time">4–5 hours</span></div>
+          <div class="record"><span class="record-id">14</span><i class="record-key" style="--record-color:var(--mint)"></i><span class="record-time">4–5 hours</span></div>
+          <div class="record"><span class="record-id">15</span><i class="record-key" style="--record-color:var(--mint)"></i><span class="record-time">4–5 hours</span></div>
+        </div>
+      </div>
+      <div class="data-note reveal"><span class="note-symbol">i</span><p><strong>Data note.</strong> The project record says one response labelled “XYZ” and one additional “More than 5 hours” response were excluded to make this sample of 15. The reason for the additional exclusion is not documented, and the original response counts cannot be independently checked from the PDF alone.</p></div>
+    </section>
+
+    <section class="section shell method" id="method" aria-labelledby="method-title">
+      <div class="section-head reveal">
+        <div><span class="eyebrow">04 / HOW TO READ THIS</span><h2 id="method-title">Transparent about<br>the assumptions.</h2></div>
+        <p>A good statistical summary is as clear about its limits as it is about its results.</p>
+      </div>
+      <div class="method-grid reveal">
+        <article class="glass method-main">
+          <h3>From questionnaire to summary</h3>
+          <p>The study uses a descriptive survey of 15 selected student records. The question analysed was: “How many hours do you spend on screens daily?” Respondents selected one of four bands: 2–3, 3–4, 4–5, or more than 5 hours.</p>
+          <p>For the estimated mean, the first three class midpoints are 2.5, 3.5, and 4.5 hours. The open-ended “More than 5 hours” group is assigned 5.5 hours solely for illustration, as if it were a 5–6 hour band.</p>
+          <span class="formula">(3 × 2.5) + (4 × 3.5) + (4 × 4.5) + (4 × 5.5) = 61.5</span>
+        </article>
+        <aside class="glass method-side">
+          <h3>What the data cannot say</h3>
+          <p><strong>The exact mean and exact median time are unknown.</strong> The questionnaire records ranges only, and the final range has no upper limit. The 4.10-hour mean is an estimate based on an explicit midpoint assumption, not a directly measured average.</p>
+          <ol class="steps"><li><span>01</span><span>Bar and pie charts show the four categories as recorded.</span></li><li><span>02</span><span>The histogram’s 5–6 hour final band is illustrative, not measured.</span></li><li><span>03</span><span>Findings describe this selected sample, not all students.</span></li></ol>
+        </aside>
+      </div>
+    </section>
+
+    <section class="closing shell reveal" aria-label="Conclusion">
+      <span class="eyebrow">A CONCLUSION, WITH CONTEXT</span>
+      <h2>Most responses sit at three hours or above. The exact average remains an estimate.</h2>
+      <p>In this selected group, three categories tie for the highest frequency and the median falls in the 4–5 hour band. The data offers a useful snapshot, not a complete picture of student screen habits.</p>
+      <div class="closing-rule" aria-hidden="true"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner shell"><span>CT UNIVERSITY &nbsp; / &nbsp; BTECH CSE (AI &amp; DS) · SECTION A</span><span class="footer-credit">A STATISTICS PRACTICAL <span>✳</span> 2026—2027</span></div>
+  </footer>
+
+  <script>
+    const chartButtons = document.querySelectorAll('[data-chart]');
+    const barChart = document.getElementById('barChart');
+    const barAxis = document.getElementById('barAxis');
+    const shareChart = document.getElementById('shareChart');
+
+    chartButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const showingShare = button.dataset.chart === 'share';
+        chartButtons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+        barChart.hidden = showingShare;
+        barAxis.hidden = showingShare;
+        shareChart.classList.toggle('is-visible', showingShare);
+      });
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-in');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.reveal').forEach((item) => observer.observe(item));
+  </script>
+</body>
+</html>
